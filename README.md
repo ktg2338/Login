@@ -205,4 +205,18 @@ afterCompletion() 을 사용해야 한다.
 인터셉터는 스프링 MVC 구조에 특화된 필터 기능을 제공한다고 이해하면 된다. 스프링 MVC를 사용하고,
 특별히 필터를 꼭 사용해야 하는 상황이 아니라면 인터셉터를 사용하는 것이 더 편리하다.
 
-14
+![image](https://user-images.githubusercontent.com/69129562/205931308-0a906612-0fde-40e2-827f-ff1bdfb54077.png)
+request.setAttribute(LOG_ID, uuid)
+서블릿 필터의 경우 지역변수로 해결이 가능하지만, 스프링 인터셉터는 호출 시점이 완전히 분리되어
+있다. 따라서 preHandle 에서 지정한 값을 postHandle , afterCompletion 에서 함께 사용하려면
+어딘가에 담아두어야 한다. LogInterceptor 도 싱글톤 처럼 사용되기 때문에 맴버변수를 사용하면
+위험하다. 따라서 request 에 담아두었다. 이 값은 afterCompletion 에서
+request.getAttribute(LOG_ID) 로 찾아서 사용한다.
+![image](https://user-images.githubusercontent.com/69129562/205931907-bf48389e-14f3-4eed-bd52-19c5111e9df4.png)
+HandlerMethod
+핸들러 정보는 어떤 핸들러 매핑을 사용하는가에 따라 달라진다. 스프링을 사용하면 일반적으로
+@Controller , @RequestMapping 을 활용한 핸들러 매핑을 사용하는데, 이 경우 핸들러 정보로
+HandlerMethod 가 넘어온다.
+ResourceHttpRequestHandler
+@Controller 가 아니라 /resources/static 와 같은 정적 리소스가 호출 되는 경우
+ResourceHttpRequestHandler 가 핸들러 정보로 넘어오기 때문에 타입에 따라서 처리가 필요하다.
